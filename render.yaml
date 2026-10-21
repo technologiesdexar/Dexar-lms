@@ -1,0 +1,62 @@
+services:
+  # -------------------------------------------------------------
+  # 1. Dexar LMS Backend API (Node.js / Express / MongoDB)
+  # -------------------------------------------------------------
+  - type: web
+    name: dexar-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://dexartechnologies.in
+      - key: EMAIL_USER
+        value: technologiesdexar@gmail.com
+      - key: EMAIL_PASS
+        value: refbaubhkvuwrsln
+      - key: EMAIL_FROM
+        value: "Dexar LMS <technologiesdexar@gmail.com>"
+      - key: EMAIL_REPLY_TO
+        value: technologiesdexar@gmail.com
+      - key: COMPANY_EMAIL
+        value: technologiesdexar@gmail.com
+      - key: CONTACT_RECIPIENT_EMAIL
+        value: technologiesdexar@gmail.com
+
+  # -------------------------------------------------------------
+  # 2. Dexar LMS Frontend (Next.js 16)
+  # -------------------------------------------------------------
+  - type: web
+    name: dexar-frontend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: dexar-backend
+          property: host
